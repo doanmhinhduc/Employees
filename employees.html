@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<body>
+    <div class="w3-container">
+        <div class="w3-row w3-margin">
+            <div class="w3-col">
+                <a href="index.html">Back to Employees list</a>
+            </div>
+        </div>
+        <div class="w3-row w3-margin">
+            <form class="w3-container w3-card-4" name="product-form">
+                <h2 class="w3-text-blue">createEmployees</h2>
+                <p>Please enter the information below</p>
+                <p>
+                    <label class="w3-text-blue"><b>name</b></label>
+                    <input class="w3-input w3-border" name="name" type="text">
+                </p>
+                <p>
+                    <label class="w3-text-blue"><b>wage</b></label>
+                    <input class="w3-input w3-border" name="wage" type="mumber">
+                </p>
+                <p>
+                    <input type="submit" class="w3-btn w3-blue" name="submit" value="Save">
+                    <input type="reset" class="w3-btn w3-blue" value="Reset">
+                </p>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            var action = 1; 
+            var url = 'http://localhost:8080/api/v1/Employees';
+            var method = 'POST';
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (id) {
+                action = 2; 
+            }
+          
+            var btnSubmit = document.forms['product-form']['submit'];
+            
+            var inputTitle = document.forms['product-form']['name'];
+            var inputDescription = document.forms['product-form']['wage'];
+
+
+
+            
+            if (action === 2) {
+                url = `http://localhost:8080/api/v1/Employees/${id}`;
+                method = 'PUT';
+                loadProductDetail(id);
+            }
+            btnSubmit.onclick = function (e) {
+                e.preventDefault();           
+                var objectToSend = {
+                    'name': inputTitle.value,
+                    'wage': inputDescription.value,
+
+
+                }
+                var data = JSON.stringify(objectToSend); 
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 201 || xhr.status === 200) {
+                        alert('successful manipulation');
+                        window.location.href = 'index.html'; 
+                    }
+                }
+                xhr.open(method, url, false);
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhr.send(data);
+            }
+        });
+
+        function loadProductDetail(id) {
+            var getProductDetailUrl = `http://localhost:8080/api/v1/Employees/${id}`;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        var productDetail = JSON.parse(xhr.responseText);
+                        document.forms['product-form']['name'].value = productDetail.name;
+                        document.forms['product-form']['wage'].value = productDetail.wage;
+                    } else {
+                        alert('Unable to load Employees ');
+                    }
+                }
+            }
+            xhr.open('GET', getProductDetailUrl, false);
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>
